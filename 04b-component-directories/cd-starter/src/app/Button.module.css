@@ -1,0 +1,3 @@
+.btn {
+  @apply rounded-full bg-blue-700 text-white px-5 py-2 font-bold;
+}

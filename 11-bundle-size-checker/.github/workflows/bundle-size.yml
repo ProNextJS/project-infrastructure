@@ -1,0 +1,57 @@
+name: "Bundle Size Check"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: ./
+
+env:
+  CI_REPO_OWNER: jherr
+  CI_REPO_NAME: bundle-size-checker
+  CI_COMMIT_SHA: ${{ github.sha }}
+  CI_BRANCH: main
+  BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Install
+        run: pnpm install
+
+      - name: Restore next build
+        uses: actions/cache@v3
+        id: restore-build-cache
+        env:
+          cache-name: cache-next-build
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+
+      - name: Build next.js app
+        run: ./node_modules/.bin/next build
+
+      - name: Analyze bundle
+        run: pnpm bundlewatch
