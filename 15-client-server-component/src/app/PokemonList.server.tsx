@@ -1,4 +1,4 @@
-import PokemonListClient from "./PokemonListClient";
+import PokemonListClient from "./PokemonList.client";
 
 export default async function PokemonList() {
   const res = await fetch("https://pokeapi.co/api/v2/pokemon");
